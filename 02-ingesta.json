@@ -1,0 +1,183 @@
+{
+  "name": "02-ingesta",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "subir politicas",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "archivo",
+              "fieldType": "file"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "13f32db2-dbd5-4a40-84bc-083ab66a4602",
+      "name": "On form submission",
+      "webhookId": "ed8b5b72-1392-4fd6-8779-7807642e7f4e"
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "binaryPropertyName": "archivo",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "200fd2ea-8bf2-4eac-99a2-3a1a95cf8d66",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": "politicas_voltatech",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        448,
+        0
+      ],
+      "id": "f1cc87a9-1873-4011-879c-ec9d766fdf3c",
+      "name": "Postgres PGVector Store",
+      "credentials": {
+        "postgres": {
+          "id": "0h1RbnuG2lVn1vDp",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        368,
+        192
+      ],
+      "id": "af7d56ea-2535-4d2e-b9ea-25fe89316e33",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "h3CCbjJxwUesJXCN",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.data }}",
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        592,
+        208
+      ],
+      "id": "742f0bac-d2c6-4efc-a8fc-31bfc45f53c8",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkSize": 500,
+        "chunkOverlap": 50,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        688,
+        336
+      ],
+      "id": "52f1ec9b-58e0-4e20-bb8b-643045352ad4",
+      "name": "Recursive Character Text Splitter"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "4a471315-e04b-4a64-9802-cad32a41ff03",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6a8590e203a9e52eebae8b4c8d63586e0bd105c35f154506c9066f18f279d9ba"
+  },
+  "nodeGroups": [],
+  "id": "bIE5EZyRunCDFdxZ",
+  "tags": []
+}
