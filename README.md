@@ -12,7 +12,7 @@ Escenario B: soporte de una tienda en línea. VoltaTech es una tienda ficticia d
 
 ## 3. Diagrama del workflow
 
-![Workflow 01-agente](evidencias/workflow-agente.png)
+
 
 ```
 Chat Trigger ──▶ AI Agent
